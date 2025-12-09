@@ -31,6 +31,8 @@ services:
       DATABASE_USER: ${POSTGRES_USER}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
       DATABASE_NAME: ${POSTGRES_DB}
+      NODE_ENV: ${NODE_ENV:-development}
+      RUN_SEEDS: ${RUN_SEEDS:-false}
     depends_on:
       postgres:
         condition: service_healthy

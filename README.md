@@ -28,6 +28,7 @@ cp .env.example .env
 
 The `.env` file contains the database configuration for local development. You can modify the values if needed for your local setup.
 
+
 ### 3. Start all services
 
 ```bash
@@ -145,17 +146,53 @@ npm run migration:revert
 - TypeORM will automatically add a timestamp prefix to migration files
 - Migrations are tracked in the database and executed automatically in order
 
+### Database Seeding
+
+The application supports automatic seeding on startup and manual seeding via command line.
+
+#### Automatic Seeding (On App Startup)
+
+To automatically seed the database when the application starts, add this to your `.env` file:
+
+```bash
+RUN_SEEDS=true
+```
+
+**Note:** Seeds only run automatically in non-production environments. They run after the app connects to the database.
+
+#### Manual Seeding
+
+To manually seed the database:
+
+```bash
+npm run seed:companies
+```
+
+**Important:**
+- The seed script will clear all existing data before seeding (truncates tables)
+- It creates 6 companies with various pricing configurations:
+  - Some companies have only absolute pricings
+  - Some companies have mixed absolute and relative pricings
+- Make sure migrations have been run before seeding: `npm run migration:run`
+
 ## Project Structure
 
 ```
 src/
 ├── companies/           # Companies module
+│   ├── domain/         # Domain entities and enums
+│   │   ├── entities/   # TypeORM entities
+│   │   └── enums/      # Domain enums
 │   ├── dto/            # Data Transfer Objects
-│   ├── entities/       # TypeORM entities
 │   ├── companies.controller.ts
 │   ├── companies.service.ts
 │   └── companies.module.ts
+├── seeds/              # Database seed files
+│   ├── seed-companies-and-pricings.ts
+│   └── seeder.service.ts  # Auto-seeding service
+├── migrations/         # Database migrations
 ├── app.module.ts       # Root module
+├── data-source.ts      # TypeORM data source configuration
 └── main.ts            # Application entry point
 ```
 

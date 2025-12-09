@@ -21,7 +21,7 @@
     "migration:generate": "./scripts/migration-generate.sh",
     "migration:run": "docker-compose exec -T app sh -c 'cd /usr/src/app && npx typeorm-ts-node-commonjs migration:run -d src/data-source.ts'",
     "migration:revert": "docker-compose exec -T app sh -c 'cd /usr/src/app && npx typeorm-ts-node-commonjs migration:revert -d src/data-source.ts'",
-    "seed": "docker-compose exec -T app sh -c 'cd /usr/src/app && npx ts-node src/seeds/seed.ts'",
+    "seed:companies": "docker-compose exec -T app sh -c 'cd /usr/src/app && npx ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\",\\\"moduleResolution\\\":\\\"node\\\"}\" src/seeds/seed-companies-and-pricings.ts'",
     "prepare": "husky"
   },
   "dependencies": {
