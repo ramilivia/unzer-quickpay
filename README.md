@@ -129,14 +129,21 @@ npm run test:e2e
 
 ```bash
 # Generate a new migration
-npm run migration:generate -- -n MigrationName
+# Note: Always specify the full path including src/migrations/ folder
+npm run migration:generate -- src/migrations/CreateCompanyAndPricingTables
 
-# Run migrations
+# Run pending migrations
 npm run migration:run
 
-# Revert last migration
+# Revert the last executed migration
 npm run migration:revert
 ```
+
+**Important:**
+- Migrations are stored in `src/migrations/` folder
+- Always use descriptive names for migrations (e.g., `CreateCompanyAndPricingTables`)
+- TypeORM will automatically add a timestamp prefix to migration files
+- Migrations are tracked in the database and executed automatically in order
 
 ## Project Structure
 

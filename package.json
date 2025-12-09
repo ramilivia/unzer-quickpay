@@ -18,6 +18,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migration:generate": "./scripts/migration-generate.sh",
+    "migration:run": "docker-compose exec -T app sh -c 'cd /usr/src/app && npx typeorm-ts-node-commonjs migration:run -d src/data-source.ts'",
+    "migration:revert": "docker-compose exec -T app sh -c 'cd /usr/src/app && npx typeorm-ts-node-commonjs migration:revert -d src/data-source.ts'",
+    "seed": "docker-compose exec -T app sh -c 'cd /usr/src/app && npx ts-node src/seeds/seed.ts'",
     "prepare": "husky"
   },
   "dependencies": {
