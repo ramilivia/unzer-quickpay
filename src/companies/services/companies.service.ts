@@ -1,0 +1,32 @@
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CompanyResponseDto } from '../dto/company-response.dto';
+import { Company } from '../domain/entities/company.entity';
+import { CostType } from '../domain/enums/cost-type.enum';
+
+@Injectable()
+export class CompaniesService {
+  constructor(
+    @InjectRepository(Company)
+    private readonly companyRepository: Repository<Company>,
+  ) {}
+
+  async create(companyEntity: Partial<Company>): Promise<CompanyResponseDto> {
+    if (companyEntity.pricings && companyEntity.pricings.length > 0) {
+      const hasRelativePricing = companyEntity.pricings.some(
+        (p) => p.costType === CostType.RELATIVE,
+      );
+      const hasBasePlan = companyEntity.pricings.some((p) => p.isBasePlan === true);
+
+      if (hasRelativePricing && !hasBasePlan) {
+        throw new BadRequestException('A base plan is required when creating relative pricings');
+      }
+    }
+
+    const company = this.companyRepository.create(companyEntity);
+    const savedCompany = await this.companyRepository.save(company);
+
+    return CompanyResponseDto.fromEntity(savedCompany);
+  }
+}

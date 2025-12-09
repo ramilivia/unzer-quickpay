@@ -18,8 +18,8 @@ export class Pricing {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
-  description: string;
+  @Column({ type: 'varchar', nullable: true })
+  description: string | null;
 
   @Column('decimal', { precision: 10, scale: 2 })
   cost: number;

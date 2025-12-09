@@ -25,6 +25,7 @@ services:
       - '3000:3000'
     volumes:
       - ./src:/usr/src/app/src
+    command: npm run start:dev
     environment:
       DATABASE_HOST: postgres
       DATABASE_PORT: ${DATABASE_PORT:-5432}

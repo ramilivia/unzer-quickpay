@@ -180,12 +180,16 @@ npm run seed:companies
 ```
 src/
 ├── companies/           # Companies module
+│   ├── controllers/    # Controllers
+│   │   ├── companies.controller.ts
+│   │   └── companies.controller.spec.ts
+│   ├── services/       # Services
+│   │   ├── companies.service.ts
+│   │   └── companies.service.spec.ts
 │   ├── domain/         # Domain entities and enums
 │   │   ├── entities/   # TypeORM entities
 │   │   └── enums/      # Domain enums
 │   ├── dto/            # Data Transfer Objects
-│   ├── companies.controller.ts
-│   ├── companies.service.ts
 │   └── companies.module.ts
 ├── seeds/              # Database seed files
 │   ├── seed-companies-and-pricings.ts
