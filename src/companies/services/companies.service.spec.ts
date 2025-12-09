@@ -12,6 +12,7 @@ describe('CompaniesService', () => {
   const mockRepository = {
     create: jest.fn(),
     save: jest.fn(),
+    find: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -220,6 +221,103 @@ describe('CompaniesService', () => {
         country: 'United States',
       });
       expect(result.pricings).toHaveLength(2);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return an array of company entities', async () => {
+      const companies = [
+        {
+          id: 1,
+          name: 'Company 1',
+          country: 'United States',
+          description: null,
+          address: null,
+          phone: null,
+          pricings: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        } as Company,
+        {
+          id: 2,
+          name: 'Company 2',
+          country: 'Canada',
+          description: null,
+          address: null,
+          phone: null,
+          pricings: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        } as Company,
+      ];
+
+      mockRepository.find.mockResolvedValue(companies);
+
+      const result = await service.findAll();
+
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        relations: ['pricings'],
+      });
+      expect(result).toHaveLength(2);
+      expect(result[0]).toMatchObject({
+        id: 1,
+        name: 'Company 1',
+        country: 'United States',
+      });
+      expect(result[1]).toMatchObject({
+        id: 2,
+        name: 'Company 2',
+        country: 'Canada',
+      });
+    });
+
+    it('should return an empty array when no companies exist', async () => {
+      mockRepository.find.mockResolvedValue([]);
+
+      const result = await service.findAll();
+
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        relations: ['pricings'],
+      });
+      expect(result).toEqual([]);
+    });
+
+    it('should include pricings in the entities', async () => {
+      const companies = [
+        {
+          id: 1,
+          name: 'Company 1',
+          country: 'United States',
+          description: null,
+          address: null,
+          phone: null,
+          pricings: [
+            {
+              id: 1,
+              name: 'Basic Plan',
+              cost: 99.99,
+              costType: CostType.ABSOLUTE,
+              isBasePlan: true,
+              companyId: 1,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            } as Pricing,
+          ],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        } as Company,
+      ];
+
+      mockRepository.find.mockResolvedValue(companies);
+
+      const result = await service.findAll();
+
+      expect(result[0].pricings).toHaveLength(1);
+      expect(result[0].pricings?.[0]).toMatchObject({
+        id: 1,
+        name: 'Basic Plan',
+        cost: 99.99,
+      });
     });
   });
 });

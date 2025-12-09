@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CompanyResponseDto } from '../dto/company-response.dto';
 import { Company } from '../domain/entities/company.entity';
 import { CostType } from '../domain/enums/cost-type.enum';
+import { CompanyResponseDto } from '../dto/company-response.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -28,5 +28,13 @@ export class CompaniesService {
     const savedCompany = await this.companyRepository.save(company);
 
     return CompanyResponseDto.fromEntity(savedCompany);
+  }
+
+  async findAll(): Promise<Company[]> {
+    const companies = await this.companyRepository.find({
+      relations: ['pricings'],
+    });
+
+    return companies;
   }
 }
