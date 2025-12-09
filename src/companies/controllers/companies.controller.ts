@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, ValidationPipe } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, ValidationPipe, ParseIntPipe } from '@nestjs/common';
 import { CompaniesService } from '../services/companies.service';
 import { CreateCompanyDto } from '../dto/create-company.dto';
 import { CompanyResponseDto } from '../dto/company-response.dto';
@@ -19,5 +19,11 @@ export class CompaniesController {
   async findAll(): Promise<CompanyResponseDto[]> {
     const companies = await this.companiesService.findAll();
     return companies.map((company) => CompanyResponseDto.fromEntity(company));
+  }
+
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<CompanyResponseDto> {
+    const company = await this.companiesService.findOne(id);
+    return CompanyResponseDto.fromEntity(company);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Company } from '../domain/entities/company.entity';
@@ -36,5 +36,18 @@ export class CompaniesService {
     });
 
     return companies;
+  }
+
+  async findOne(id: number): Promise<Company> {
+    const company = await this.companyRepository.findOne({
+      where: { id },
+      relations: ['pricings'],
+    });
+
+    if (!company) {
+      throw new NotFoundException(`Company with ID ${id} not found`);
+    }
+
+    return company;
   }
 }
