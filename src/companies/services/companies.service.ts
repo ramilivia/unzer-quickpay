@@ -135,4 +135,9 @@ export class CompaniesService {
     // Save the updated company and return it
     return this.companyRepository.save(companyStored);
   }
+
+  async remove(id: number): Promise<void> {
+    const company = await this.findOne(id);
+    await this.companyRepository.remove(company);
+  }
 }

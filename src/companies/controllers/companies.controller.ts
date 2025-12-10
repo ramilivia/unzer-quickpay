@@ -3,10 +3,13 @@ import {
   Post,
   Get,
   Patch,
+  Delete,
   Body,
   Param,
   ValidationPipe,
   ParseIntPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { CompaniesService } from '../services/companies.service';
 import { CreateCompanyDto } from '../dto/create-company.dto';
@@ -45,5 +48,11 @@ export class CompaniesController {
     const companyEntity = CreateCompanyDto.toEntity(updateCompanyDto as CreateCompanyDto);
     const updatedCompany = await this.companiesService.update(id, companyEntity);
     return CompanyResponseDto.fromEntity(updatedCompany);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.companiesService.remove(id);
   }
 }

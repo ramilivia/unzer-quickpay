@@ -9,6 +9,7 @@ export const mockCompanyRepository = {
   save: jest.fn(),
   find: jest.fn(),
   findOne: jest.fn(),
+  remove: jest.fn(),
 };
 
 export const mockPricingRepository = {
