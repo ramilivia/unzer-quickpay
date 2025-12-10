@@ -14,7 +14,7 @@ A REST API service built with NestJS, TypeScript, PostgreSQL and Docker for mana
 
 ## Why NestJS? (Architecture-Focused Overview)
 
-The decision felt very natural since I am a seasoned javascript developer and I really think NestJS it's the best available framework for backend. 
+The decision felt very natural since I am a seasoned javascript developer and I really think NestJS it's the best available framework for backend on the javascript ecosystem. 
 
 NestJS is a progressive Node.js framework that works on top of express and provides a strong architectural foundation out of the box.  It follows proven backend design practices—similar to those used in enterprise frameworks like Spring Boot—making it ideal for building scalable, maintainable, and testable server-side applications.
 
