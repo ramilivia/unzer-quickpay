@@ -1,11 +1,75 @@
 # Unzer QuickPay
 
-A REST API service built with NestJS, TypeScript, and PostgreSQL for managing companies and their pricing plans.
+A REST API service built with NestJS, TypeScript, PostgreSQL and Docker for managing companies and their pricing plans.
 
-## Prerequisites
+# Technology Stack
 
-- Docker Desktop installed and running
-- Git
+## Why NestJS? (Architecture-Focused Overview)
+
+The decision felt very natural since I am a seasoned javascript developer and I really think NestJS it's the best available framework for backend. 
+
+NestJS is a progressive Node.js framework that works on top of express and provides a strong architectural foundation out of the box.  It follows proven backend design practices—similar to those used in enterprise frameworks like Spring Boot—making it ideal for building scalable, maintainable, and testable server-side applications.
+
+### Modular Architecture
+NestJS organizes code using **modules**, each containing controllers, services, and providers.  
+This keeps features separated, makes the project easier to navigate, and supports clear boundaries between responsibilities.
+
+### Layered Design (Same Pattern Used in Spring Boot)
+NestJS encourages a classic **Layered Architecture** (also called N-Tier), typically consisting of:
+
+- **Controllers** — handle requests and responses  
+- **Services** — contain business logic  
+- **Repositories** — manage data access  
+
+This approach provides clear separation of concerns, predictable structure, and easier testing, while laying a solid foundation for future architectural growth.
+
+### Built-In TypeScript and Type Safety
+NestJS is written in **TypeScript** and fully supports static typing.  
+Benefits include:
+
+- Strong type safety across the entire application  
+- Safer refactoring and maintenance  
+- Better IDE support and autocompletion  
+- Fewer runtime errors thanks to early compile-time checks  
+
+### Dependency Injection for Flexibility and Testability
+NestJS uses **dependency injection (DI)** throughout the framework.  
+DI makes components **loosely coupled**, allowing you to easily replace or mock dependencies during testing.  
+This improves testability by enabling unit tests that focus on one class at a time without relying on real databases, services, or external APIs.
+
+### Database Integration
+NestJS has **native support for TypeORM**, making database integration simple and efficient.  
+It works seamlessly with relational databases such as **PostgreSQL**, providing:
+
+- Easy entity and repository management  
+- Strong type safety for database operations  
+- Automated migrations and schema synchronization  
+- Clean separation between business logic and data access  
+
+### Powerful CLI
+NestJS comes with a **command-line interface (CLI)** that streamlines development by allowing you to quickly generate modules, controllers, services, and other boilerplate code.  
+The CLI helps enforce project structure, reduces repetitive tasks, and accelerates onboarding for new team members.
+
+### Support for Event-Driven and Microservices Architectures
+NestJS has built-in support for event-driven workflows and **microservices**, with transport layers such as Redis, NATS, gRPC, Kafka, and RabbitMQ.  
+Teams can start with a monolith and gradually adopt distributed services without major rewrites.
+
+### Built-In Features for Common Backend Tasks
+NestJS provides structured tools to handle recurring backend tasks, keeping your code organized:
+
+- **Guards** — handle authorization  
+- **Pipes** — validation and data transformation  
+- **Interceptors** — logging, caching, and other cross-cutting concerns  
+- **Exception Filters** — centralized error handling  
+- **Middleware** — request processing extensions  
+
+These features help separate business logic from supporting infrastructure, making the code easier to maintain and scale.
+
+## PostgreSQL
+
+PostgreSQL is a powerful, open-source relational database known for reliability, strong data integrity, and advanced SQL features. It supports ACID-compliant transactions, rich data types like JSON and arrays, and extensions such as PostGIS. With high performance, scalability, and seamless integration with ORMs like TypeORM, PostgreSQL provides a stable and type-safe foundation for modern backend applications built with NestJS, and it can also enable semantic search using embeddings for advanced search capabilitie
+
+# Getting Started
 
 ## Quick Start
 
