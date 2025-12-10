@@ -69,8 +69,16 @@ Users should have an open channel for reporting issues, this channel could be in
 Tools like datadog allow for having a calendar with the information for on-call rotation for our team members. Integrated with a tool like opsgenie this will trigger a notification to the right person, in case the notification it's not answered this will notify the next person available.
 
 
-A Slack channel also gets created with all the information regarding this incident and with the pertinent team members. This channel will act as a war room and consolidate all of the progress.
+A Slack channel also gets created with all the information regarding this incident and with the pertinent team members.
 
-## 3. Post-Mortem
+## 3. During Incident Response
+
+The on-call engineer should immediately assess impact and scope by checking which services are affected through monitoring tools and reviewing recent deployments for potential causes.
+
+The war room Slack channel consolidates all updates and coordination. If a recent deployment is suspected, the team should prepare a rollback plan while investigation continues.
+
+When the issue is identified, the team implements the fix or mitigation. This could involve rolling back a deployment, applying a hotfix, or using feature flags to disable problematic functionality. Stakeholders are kept informed through the war room channel.
+
+## 4. Post-Mortem
 
 Once the incident was fixed a Post-Mortem document should be created explaining the root cause and the fix for the problem to have as a future reference
