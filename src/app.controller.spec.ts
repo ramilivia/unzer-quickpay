@@ -15,8 +15,12 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return health check status', () => {
+      const result = appController.getHealth();
+      expect(result).toEqual({
+        status: 'ok',
+        message: 'Server is online',
+      });
     });
   });
 });
