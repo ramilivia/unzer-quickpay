@@ -33,3 +33,7 @@ This measures the percentage of deployments that cause a failure in production
 For low performers more than 60% of the deployments fail while for high performenrs this should be less than 10%
 
 ## 4. Time To Restore Service (MTTR)
+
+This measures how long does it take to recover from a failure in production.
+
+High performers recover in less than one hour while low performers usually take longer than a day.
