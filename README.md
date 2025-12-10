@@ -75,7 +75,7 @@ These features help separate business logic from supporting infrastructure, maki
 
 ## PostgreSQL
 
-PostgreSQL is a powerful, open-source relational database known for reliability, strong data integrity, and advanced SQL features. It supports ACID-compliant transactions, rich data types like JSON and arrays, and extensions such as PostGIS. With high performance, scalability, and seamless integration with ORMs like TypeORM, PostgreSQL provides a stable and type-safe foundation for modern backend applications built with NestJS, and it can also enable semantic search using embeddings for advanced search capabilitie
+PostgreSQL is a powerful, open-source relational database known for reliability, strong data integrity, and advanced SQL features. It supports ACID-compliant transactions, rich data types like JSON and arrays, and extensions such as PostGIS. With high performance, scalability, and seamless integration with ORMs like TypeORM, PostgreSQL provides a stable and type-safe foundation for modern backend applications built with NestJS, and it can also enable semantic search using embeddings for advanced search capabilities.
 
 # Getting Started
 
@@ -158,7 +158,7 @@ npm test
 
 # Test coverage
 npm run test:cov
-
+```
 
 ### Database Migrations
 
