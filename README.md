@@ -2,6 +2,8 @@
 
 A REST API service built with NestJS, TypeScript, PostgreSQL and Docker for managing companies and their pricing plans.
 
+## Technologies Used
+
 - **NestJS** - Progressive Node.js framework
 - **TypeScript** - Type-safe JavaScript
 - **PostgreSQL** - Relational database
@@ -116,46 +118,13 @@ This will start:
 curl http://localhost:3000/
 ```
 
-Expected response: `Hello World!`
-
-## Accessing pgAdmin
-
-**Note:** The pgAdmin credentials below are for **local development only**.
-
-### Step 1: Open pgAdmin
-
-Navigate to: `http://localhost:5050`
-
-### Step 2: Login
-
-- **Email**: `admin@admin.com`
-- **Password**: `admin`
-
-⚠️ **These are default credentials for local development. Change them in production.**
-
-### Step 3: Add Server Connection
-
-1. Right-click on **"Servers"** in the left sidebar
-2. Select **"Register"** → **"Server..."**
-
-3. Fill in the connection details:
-
-   **General Tab:**
-   - **Name**: `Unzer QuickPay` (or any name)
-
-   **Connection Tab:**
-   - **Host name/address**: `postgres`
-   - **Port**: `5432`
-   - **Maintenance database**: `unzer_quickpay` (or your `POSTGRES_DB` value)
-   - **Username**: `postgres` (from your `.env` file)
-   - **Password**: `postgres` (from your `.env` file)
-   - ✅ Check "Save password" (optional)
-
-⚠️ **These database credentials match your `.env` file values for local development only.**
-
-4. Click **"Save"**
-
-The server will appear in the left sidebar. Click on it to expand and explore the database.
+Expected response:
+```json
+{
+  "status": "ok",
+  "message": "Server is online"
+}
+```
 
 ## API Documentation
 
@@ -163,6 +132,29 @@ Once the service is running, interactive API documentation is available via Swag
 
 ```
 http://localhost:3000/api
+```
+
+## Project Structure
+
+```
+src/
+├── companies/                    # Companies module
+│   ├── controllers/              # Controllers layer
+│   │   └── tests/                # Controller unit tests
+│   ├── services/                 # Services layer (business logic)
+│   │   └── tests/                # Service unit tests
+│   ├── domain/                   # Domain layer
+│   │   ├── entities/             # TypeORM entities
+│   │   └── enums/                # Domain enumerations
+│   ├── dto/                      # Data Transfer Objects
+│   └── companies.module.ts       # NestJS module definition
+├── seeds/                        # Database seed files
+├── migrations/                   # TypeORM database migrations
+├── app.module.ts                 # Root application module
+├── app.controller.ts             # Health check controller
+├── app.service.ts                # Health check service
+├── data-source.ts                # TypeORM data source configuration
+└── main.ts                       # Application entry point
 ```
 
 ## Development
@@ -245,31 +237,6 @@ npm run seed:companies
   - Some companies have mixed absolute and relative pricings
 - Make sure migrations have been run before seeding: `npm run migration:run`
 
-## Project Structure
-
-```
-src/
-├── companies/           # Companies module
-│   ├── controllers/    # Controllers
-│   │   ├── companies.controller.ts
-│   │   └── companies.controller.spec.ts
-│   ├── services/       # Services
-│   │   ├── companies.service.ts
-│   │   └── companies.service.spec.ts
-│   ├── domain/         # Domain entities and enums
-│   │   ├── entities/   # TypeORM entities
-│   │   └── enums/      # Domain enums
-│   ├── dto/            # Data Transfer Objects
-│   └── companies.module.ts
-├── seeds/              # Database seed files
-│   ├── seed-companies-and-pricings.ts
-│   └── seeder.service.ts  # Auto-seeding service
-├── migrations/         # Database migrations
-├── app.module.ts       # Root module
-├── data-source.ts      # TypeORM data source configuration
-└── main.ts            # Application entry point
-```
-
 ## Docker Commands
 
 ```bash
@@ -289,5 +256,42 @@ docker-compose down -v
 docker-compose up --build
 ```
 
+## Accessing pgAdmin (Database Client)
 
+**Note:** The pgAdmin credentials below are for **local development only**.
+
+### Step 1: Open pgAdmin
+
+Navigate to: `http://localhost:5050`
+
+### Step 2: Login
+
+- **Email**: `admin@admin.com`
+- **Password**: `admin`
+
+⚠️ **These are default credentials for local development. Change them in production.**
+
+### Step 3: Add Server Connection
+
+1. Right-click on **"Servers"** in the left sidebar
+2. Select **"Register"** → **"Server..."**
+
+3. Fill in the connection details:
+
+   **General Tab:**
+   - **Name**: `Unzer QuickPay` (or any name)
+
+   **Connection Tab:**
+   - **Host name/address**: `postgres`
+   - **Port**: `5432`
+   - **Maintenance database**: `unzer_quickpay` (or your `POSTGRES_DB` value)
+   - **Username**: `postgres` (from your `.env` file)
+   - **Password**: `postgres` (from your `.env` file)
+   - ✅ Check "Save password" (optional)
+
+⚠️ **These database credentials match your `.env` file values for local development only.**
+
+4. Click **"Save"**
+
+The server will appear in the left sidebar. Click on it to expand and explore the database.
 
