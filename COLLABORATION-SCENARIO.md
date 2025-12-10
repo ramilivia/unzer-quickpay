@@ -12,4 +12,6 @@ The best approach would be to request the two engineers involved to conduct rese
 
 Once the knowledge sharing sessions have happened, a workshop should be facilitated with all members involved, where we are going to fill a matrix with different dimensions for example functionality, pricing, familiarity, community, support, and others. Once the session is concluded, we should have a team decision where everyone is responsible for the outcome.
 
+If the team cannot reach consensus, as the Engineering Manager I would make the final decision based on the data collected, taking into account business constraints, team capacity, and strategic alignment. The decision and rationale would be transparently communicated to ensure buy-in from the whole team.
+
 Engineering Managers should advocate for a safe space for discussion and to enable teams to perform and take informed decisions, instead of taking such important decisions by themselves. The experience and knowledge from all team members could reveal perspectives that were overlooked in an initial investigation phase. Also, it is demonstrated that teams that perform the best are teams with a very developed sense of ownership and accountability.

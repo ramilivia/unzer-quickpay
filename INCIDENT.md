@@ -73,12 +73,14 @@ A Slack channel also gets created with all the information regarding this incide
 
 ## 3. During Incident Response
 
-The on-call engineer should immediately assess impact and scope by checking which services are affected through monitoring tools and reviewing recent deployments for potential causes.
+The on-call engineer should immediately assess impact and scope by checking which services are affected through monitoring tools and reviewing recent deployments for potential causes. The incident should be classified by severity (P0: service down, P1: degraded performance affecting users, P2: minor issues, P3: low impact).
 
-The war room Slack channel consolidates all updates and coordination. If a recent deployment is suspected, the team should prepare a rollback plan while investigation continues.
+The war room Slack channel consolidates all updates and coordination. If a recent deployment is suspected, the team should prepare a rollback plan while investigation continues. Updates should be provided at regular intervals (every 15-30 minutes for P0/P1 incidents) to keep stakeholders informed without interrupting the investigation flow.
 
-When the issue is identified, the team implements the fix or mitigation. This could involve rolling back a deployment, applying a hotfix, or using feature flags to disable problematic functionality. Stakeholders are kept informed through the war room channel.
+When the issue is identified, the team implements the fix or mitigation. This could involve rolling back a deployment, applying a hotfix, or using feature flags to disable problematic functionality. After resolution, the service should be monitored to ensure full recovery before closing the incident.
 
 ## 4. Post-Mortem
 
-Once the incident was fixed a Post-Mortem document should be created explaining the root cause and the fix for the problem to have as a future reference
+Once the incident was fixed a Post-Mortem document should be created explaining the root cause and the fix for the problem to have as a future reference. The document should include a timeline of events, root cause analysis, and most importantly, actionable items.
+
+This creates a continuous improvement loop where incidents lead to system resilience improvements, directly impacting MTTR and Change Failure Rate over time.
