@@ -1,30 +1,40 @@
 import { IsString, IsNotEmpty, IsOptional, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CreatePricingDto } from './create-pricing.dto';
 import { Company } from '../domain/entities/company.entity';
 import { Pricing } from '../domain/entities/pricing.entity';
 
 export class CreateCompanyDto {
+  @ApiProperty({ example: 'Acme Corp', description: 'Company name' })
   @IsString()
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty({ example: 'United States', description: 'Company country' })
   @IsString()
   @IsNotEmpty()
   country: string;
 
+  @ApiPropertyOptional({ example: 'Technology company', description: 'Company description' })
   @IsString()
   @IsOptional()
   description?: string;
 
+  @ApiPropertyOptional({
+    example: '123 Tech Street, San Francisco, CA',
+    description: 'Company address',
+  })
   @IsString()
   @IsOptional()
   address?: string;
 
+  @ApiPropertyOptional({ example: '+1-555-0100', description: 'Company phone number' })
   @IsString()
   @IsOptional()
   phone?: string;
 
+  @ApiPropertyOptional({ type: [CreatePricingDto], description: 'Company pricing plans' })
   @IsArray()
   @IsOptional()
   @ValidateNested({ each: true })
