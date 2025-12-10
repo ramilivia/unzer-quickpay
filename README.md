@@ -2,7 +2,13 @@
 
 A REST API service built with NestJS, TypeScript, PostgreSQL and Docker for managing companies and their pricing plans.
 
-# Technology Stack
+- **NestJS** - Progressive Node.js framework
+- **TypeScript** - Type-safe JavaScript
+- **PostgreSQL** - Relational database
+- **TypeORM** - Object-Relational Mapping
+- **Docker** - Containerization
+- **Jest** - Testing framework
+- **Swagger** - API documentation
 
 ## Why NestJS? (Architecture-Focused Overview)
 
@@ -283,16 +289,5 @@ docker-compose down -v
 docker-compose up --build
 ```
 
-## Technologies Used
 
-- **NestJS** - Progressive Node.js framework
-- **TypeScript** - Type-safe JavaScript
-- **PostgreSQL** - Relational database
-- **TypeORM** - Object-Relational Mapping
-- **Docker** - Containerization
-- **Jest** - Testing framework
-- **Swagger** - API documentation
 
-## License
-
-[MIT licensed](LICENSE)
