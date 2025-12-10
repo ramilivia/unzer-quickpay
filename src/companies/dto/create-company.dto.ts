@@ -43,6 +43,10 @@ export class CreateCompanyDto {
     if (dto.pricings && dto.pricings.length > 0) {
       entity.pricings = dto.pricings.map((pricingDto) => {
         const pricing = new Pricing();
+        // Preserve ID if provided (for updates)
+        if (pricingDto.id !== undefined) {
+          pricing.id = pricingDto.id;
+        }
         pricing.name = pricingDto.name;
         pricing.description = pricingDto.description ?? null;
         pricing.cost = pricingDto.cost;
