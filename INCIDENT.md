@@ -24,6 +24,12 @@ I like to measure this dimension from when the Pull Request is created, since th
 If the duration for changes is taking very long, this could be split into several smaller metrics, such as time for PR, time for deployment, etc.
 
 
-
 ## 3. Change Failure Rate (CFR)
+
+This measures the percentage of deployments that cause a failure in production
+
+`Change Failure Rate = (Failed Deployments / Total Deployments) × 100%`
+
+For low performers more than 60% of the deployments fail while for high performenrs this should be less than 10%
+
 ## 4. Time To Restore Service (MTTR)
