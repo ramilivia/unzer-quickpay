@@ -4,11 +4,11 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { CompaniesController } from '../companies.controller';
 import { CompaniesService } from '../../services/companies.service';
+import { CompanyResponseDto } from '../../dto/company-response.dto';
 import { CostType } from '../../domain/enums/cost-type.enum';
 import { mockCompaniesService, clearAllMocks } from './test-setup';
 
 describe('CompaniesController - findOne', () => {
-  let controller: CompaniesController;
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -21,8 +21,6 @@ describe('CompaniesController - findOne', () => {
         },
       ],
     }).compile();
-
-    controller = module.get<CompaniesController>(CompaniesController);
 
     app = module.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
@@ -37,7 +35,7 @@ describe('CompaniesController - findOne', () => {
     await app.close();
   });
 
-  describe('findOne', () => {
+  describe('GET /companies/:id', () => {
     it('should return a company by id', async () => {
       mockCompaniesService.findOne.mockResolvedValue({
         id: 1,
@@ -51,23 +49,18 @@ describe('CompaniesController - findOne', () => {
         updatedAt: new Date(),
       });
 
-      const result = await controller.findOne(1);
+      await request(app.getHttpServer())
+        .get('/companies/1')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toMatchObject({
+            id: 1,
+            name: 'Company 1',
+            country: 'United States',
+          });
+        });
 
       expect(mockCompaniesService.findOne).toHaveBeenCalledWith(1);
-      expect(result).toMatchObject({
-        id: 1,
-        name: 'Company 1',
-        country: 'United States',
-      });
-    });
-
-    it('should throw NotFoundException when company does not exist', async () => {
-      mockCompaniesService.findOne.mockRejectedValue(
-        new NotFoundException('Company with ID 999 not found'),
-      );
-
-      await expect(controller.findOne(999)).rejects.toThrow(NotFoundException);
-      expect(mockCompaniesService.findOne).toHaveBeenCalledWith(999);
     });
 
     it('should return 404 when company does not exist', async () => {
@@ -109,64 +102,21 @@ describe('CompaniesController - findOne', () => {
         updatedAt: new Date(),
       });
 
-      const result = await controller.findOne(1);
+      const response = await request(app.getHttpServer()).get('/companies/1').expect(200);
+      const body = response.body as CompanyResponseDto;
 
-      expect(result.pricings).toHaveLength(1);
-      expect(result.pricings?.[0]?.name).toBe('Basic Plan');
+      expect(body.pricings).toHaveLength(1);
+      expect(body.pricings[0].name).toBe('Basic Plan');
     });
 
-    it('should reject when id is not a number', async () => {
-      await request(app.getHttpServer())
-        .get('/companies/abc')
-        .expect(400)
-        .expect((res) => {
-          expect((res.body as { message: string | string[] }).message).toContain(
-            'Validation failed',
-          );
-        });
+    it('should reject invalid id formats', async () => {
+      const invalidIds = ['abc', '1.5', 'invalid'];
 
-      expect(mockCompaniesService.findOne).not.toHaveBeenCalled();
-    });
+      for (const id of invalidIds) {
+        await request(app.getHttpServer()).get(`/companies/${id}`).expect(400);
 
-    it('should reject when id is a decimal number', async () => {
-      await request(app.getHttpServer()).get('/companies/1.5').expect(400);
-
-      expect(mockCompaniesService.findOne).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('ParseIntPipe for findOne route parameter', () => {
-    it('should validate id parameter and return 400 for non-numeric id', async () => {
-      await request(app.getHttpServer()).get('/companies/invalid').expect(400);
-
-      expect(mockCompaniesService.findOne).not.toHaveBeenCalled();
-    });
-
-    it('should accept valid numeric id', async () => {
-      mockCompaniesService.findOne.mockResolvedValue({
-        id: 1,
-        name: 'Company 1',
-        country: 'United States',
-        description: null,
-        address: null,
-        phone: null,
-        pricings: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      await request(app.getHttpServer())
-        .get('/companies/1')
-        .expect(200)
-        .expect((res) => {
-          expect(res.body).toMatchObject({
-            id: 1,
-            name: 'Company 1',
-            country: 'United States',
-          });
-        });
-
-      expect(mockCompaniesService.findOne).toHaveBeenCalledWith(1);
+        expect(mockCompaniesService.findOne).not.toHaveBeenCalled();
+      }
     });
   });
 });

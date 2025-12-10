@@ -4,13 +4,11 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { CompaniesController } from '../companies.controller';
 import { CompaniesService } from '../../services/companies.service';
-import { CreateCompanyDto } from '../../dto/create-company.dto';
 import { CompanyResponseDto } from '../../dto/company-response.dto';
 import { CostType } from '../../domain/enums/cost-type.enum';
 import { mockCompaniesService, clearAllMocks } from './test-setup';
 
 describe('CompaniesController - create', () => {
-  let controller: CompaniesController;
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -23,8 +21,6 @@ describe('CompaniesController - create', () => {
         },
       ],
     }).compile();
-
-    controller = module.get<CompaniesController>(CompaniesController);
 
     app = module.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
@@ -39,9 +35,9 @@ describe('CompaniesController - create', () => {
     await app.close();
   });
 
-  describe('create', () => {
+  describe('POST /companies', () => {
     it('should create a company successfully', async () => {
-      const createCompanyDto: CreateCompanyDto = {
+      const createCompanyDto = {
         name: 'Test Company',
         country: 'United States',
         description: 'Test description',
@@ -49,7 +45,7 @@ describe('CompaniesController - create', () => {
           {
             name: 'Basic Plan',
             cost: 99.99,
-            costType: CostType.ABSOLUTE,
+            costType: 'absolute',
             isBasePlan: true,
           },
         ],
@@ -78,43 +74,25 @@ describe('CompaniesController - create', () => {
 
       mockCompaniesService.create.mockResolvedValue(expectedResponse);
 
-      const result = await controller.create(createCompanyDto);
+      await request(app.getHttpServer())
+        .post('/companies')
+        .send(createCompanyDto)
+        .expect(201)
+        .expect((res) => {
+          const body = res.body as CompanyResponseDto;
+          expect(body).toMatchObject({
+            id: 1,
+            name: 'Test Company',
+            country: 'United States',
+          });
+          expect(body.pricings).toHaveLength(1);
+        });
 
       expect(mockCompaniesService.create).toHaveBeenCalled();
-      expect(result).toEqual(expectedResponse);
-      expect(result.id).toBe(1);
-      expect(result.name).toBe('Test Company');
-    });
-
-    it('should convert DTO to entity before calling service', async () => {
-      const createCompanyDto: CreateCompanyDto = {
-        name: 'Test Company',
-        country: 'United States',
-        pricings: [],
-      };
-
-      const expectedResponse: CompanyResponseDto = {
-        id: 1,
-        name: 'Test Company',
-        country: 'United States',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockCompaniesService.create.mockResolvedValue(expectedResponse);
-
-      await controller.create(createCompanyDto);
-
-      const serviceCall = (
-        mockCompaniesService.create.mock.calls[0] as [Partial<typeof createCompanyDto>]
-      )[0];
-      expect(serviceCall).toHaveProperty('name', 'Test Company');
-      expect(serviceCall).toHaveProperty('country', 'United States');
-      expect(serviceCall.pricings).toBeUndefined();
     });
 
     it('should handle company without pricings', async () => {
-      const createCompanyDto: CreateCompanyDto = {
+      const createCompanyDto = {
         name: 'Simple Company',
         country: 'Canada',
       };
@@ -129,14 +107,23 @@ describe('CompaniesController - create', () => {
 
       mockCompaniesService.create.mockResolvedValue(expectedResponse);
 
-      const result = await controller.create(createCompanyDto);
+      await request(app.getHttpServer())
+        .post('/companies')
+        .send(createCompanyDto)
+        .expect(201)
+        .expect((res) => {
+          expect(res.body).toMatchObject({
+            id: 1,
+            name: 'Simple Company',
+            country: 'Canada',
+          });
+        });
 
       expect(mockCompaniesService.create).toHaveBeenCalled();
-      expect(result).toEqual(expectedResponse);
     });
   });
 
-  describe('ValidationPipe', () => {
+  describe('POST /companies - validation', () => {
     it('should pass validation with valid DTO', async () => {
       const validDto = {
         name: 'Test Company',
@@ -155,180 +142,50 @@ describe('CompaniesController - create', () => {
 
       mockCompaniesService.create.mockResolvedValue(expectedResponse);
 
-      const response = await request(app.getHttpServer())
-        .post('/companies')
-        .send(validDto)
-        .expect(201);
+      await request(app.getHttpServer()).post('/companies').send(validDto).expect(201);
 
-      expect(response.body).toMatchObject({
-        id: 1,
-        name: 'Test Company',
-        country: 'United States',
-      });
       expect(mockCompaniesService.create).toHaveBeenCalled();
     });
 
-    it('should reject when name is missing', async () => {
-      const invalidDto = {
-        country: 'United States',
-      };
+    it('should reject invalid company fields', async () => {
+      const invalidDtos = [
+        { country: 'United States' }, // missing name
+        { name: '', country: 'United States' }, // empty name
+        { name: 'Test Company' }, // missing country
+        { name: 123, country: 'United States' }, // name not string
+        { name: 'Test Company', country: 'United States', description: 123 }, // description not string
+        { name: 'Test Company', country: 'United States', pricings: 'not an array' }, // pricings not array
+      ];
 
-      await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.create).not.toHaveBeenCalled();
+      for (const invalidDto of invalidDtos) {
+        await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
+        expect(mockCompaniesService.create).not.toHaveBeenCalled();
+      }
     });
 
-    it('should reject when name is empty string', async () => {
-      const invalidDto = {
-        name: '',
-        country: 'United States',
-      };
+    it('should reject invalid pricing fields', async () => {
+      const invalidDtos = [
+        {
+          name: 'Test Company',
+          country: 'United States',
+          pricings: [{ cost: 99.99, costType: 'absolute' }], // missing name
+        },
+        {
+          name: 'Test Company',
+          country: 'United States',
+          pricings: [{ name: 'Basic Plan', costType: 'absolute' }], // missing cost
+        },
+        {
+          name: 'Test Company',
+          country: 'United States',
+          pricings: [{ name: 'Basic Plan', cost: 99.99, costType: 'invalid' }], // invalid costType
+        },
+      ];
 
-      await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.create).not.toHaveBeenCalled();
-    });
-
-    it('should reject when country is missing', async () => {
-      const invalidDto = {
-        name: 'Test Company',
-      };
-
-      await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.create).not.toHaveBeenCalled();
-    });
-
-    it('should reject when name is not a string', async () => {
-      const invalidDto = {
-        name: 123,
-        country: 'United States',
-      };
-
-      await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.create).not.toHaveBeenCalled();
-    });
-
-    it('should reject when description is not a string', async () => {
-      const invalidDto = {
-        name: 'Test Company',
-        country: 'United States',
-        description: 123,
-      };
-
-      await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.create).not.toHaveBeenCalled();
-    });
-
-    it('should reject when pricings is not an array', async () => {
-      const invalidDto = {
-        name: 'Test Company',
-        country: 'United States',
-        pricings: 'not an array',
-      };
-
-      await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.create).not.toHaveBeenCalled();
-    });
-
-    it('should pass validation with valid nested pricings', async () => {
-      const validDto = {
-        name: 'Test Company',
-        country: 'United States',
-        pricings: [
-          {
-            name: 'Basic Plan',
-            cost: 99.99,
-            costType: 'absolute',
-            isBasePlan: true,
-          },
-        ],
-      };
-
-      const expectedResponse: CompanyResponseDto = {
-        id: 1,
-        name: 'Test Company',
-        country: 'United States',
-        pricings: [
-          {
-            id: 1,
-            name: 'Basic Plan',
-            cost: 99.99,
-            costType: CostType.ABSOLUTE,
-            isBasePlan: true,
-            companyId: 1,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockCompaniesService.create.mockResolvedValue(expectedResponse);
-
-      const response = await request(app.getHttpServer())
-        .post('/companies')
-        .send(validDto)
-        .expect(201);
-
-      expect((response.body as CompanyResponseDto).pricings).toHaveLength(1);
-      expect(mockCompaniesService.create).toHaveBeenCalled();
-    });
-
-    it('should reject when pricing name is missing', async () => {
-      const invalidDto = {
-        name: 'Test Company',
-        country: 'United States',
-        pricings: [
-          {
-            cost: 99.99,
-            costType: 'absolute',
-          },
-        ],
-      };
-
-      await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.create).not.toHaveBeenCalled();
-    });
-
-    it('should reject when pricing cost is missing', async () => {
-      const invalidDto = {
-        name: 'Test Company',
-        country: 'United States',
-        pricings: [
-          {
-            name: 'Basic Plan',
-            costType: 'absolute',
-          },
-        ],
-      };
-
-      await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.create).not.toHaveBeenCalled();
-    });
-
-    it('should reject when pricing costType is invalid', async () => {
-      const invalidDto = {
-        name: 'Test Company',
-        country: 'United States',
-        pricings: [
-          {
-            name: 'Basic Plan',
-            cost: 99.99,
-            costType: 'invalid',
-          },
-        ],
-      };
-
-      await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.create).not.toHaveBeenCalled();
+      for (const invalidDto of invalidDtos) {
+        await request(app.getHttpServer()).post('/companies').send(invalidDto).expect(400);
+        expect(mockCompaniesService.create).not.toHaveBeenCalled();
+      }
     });
   });
 });

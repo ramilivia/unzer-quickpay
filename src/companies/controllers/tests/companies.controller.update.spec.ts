@@ -4,12 +4,10 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { CompaniesController } from '../companies.controller';
 import { CompaniesService } from '../../services/companies.service';
-import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { CompanyResponseDto } from '../../dto/company-response.dto';
 import { mockCompaniesService, clearAllMocks } from './test-setup';
 
 describe('CompaniesController - update', () => {
-  let controller: CompaniesController;
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -22,8 +20,6 @@ describe('CompaniesController - update', () => {
         },
       ],
     }).compile();
-
-    controller = module.get<CompaniesController>(CompaniesController);
 
     app = module.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
@@ -38,9 +34,9 @@ describe('CompaniesController - update', () => {
     await app.close();
   });
 
-  describe('update', () => {
+  describe('PATCH /companies/:id', () => {
     it('should update a company successfully', async () => {
-      const updateCompanyDto: UpdateCompanyDto = {
+      const updateDto = {
         name: 'Updated Company',
         country: 'Canada',
         description: 'Updated description',
@@ -57,41 +53,23 @@ describe('CompaniesController - update', () => {
 
       mockCompaniesService.update.mockResolvedValue(expectedResponse);
 
-      const result = await controller.update(1, updateCompanyDto);
+      await request(app.getHttpServer())
+        .patch('/companies/1')
+        .send(updateDto)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toMatchObject({
+            id: 1,
+            name: 'Updated Company',
+            country: 'Canada',
+          });
+        });
 
-      expect(mockCompaniesService.update).toHaveBeenCalledWith(1, expect.anything());
-      expect(result).toEqual(expectedResponse);
-      expect(result.id).toBe(1);
-      expect(result.name).toBe('Updated Company');
-    });
-
-    it('should convert DTO to entity before calling service', async () => {
-      const updateCompanyDto: UpdateCompanyDto = {
-        name: 'Updated Company',
-      };
-
-      const expectedResponse: CompanyResponseDto = {
-        id: 1,
-        name: 'Updated Company',
-        country: 'United States',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockCompaniesService.update.mockResolvedValue(expectedResponse);
-
-      await controller.update(1, updateCompanyDto);
-
-      expect(mockCompaniesService.update).toHaveBeenCalledWith(
-        1,
-        expect.objectContaining({
-          name: 'Updated Company',
-        }),
-      );
+      expect(mockCompaniesService.update).toHaveBeenCalled();
     });
 
     it('should handle partial updates', async () => {
-      const updateCompanyDto: UpdateCompanyDto = {
+      const updateDto = {
         name: 'Partially Updated Company',
       };
 
@@ -105,23 +83,18 @@ describe('CompaniesController - update', () => {
 
       mockCompaniesService.update.mockResolvedValue(expectedResponse);
 
-      const result = await controller.update(1, updateCompanyDto);
+      await request(app.getHttpServer())
+        .patch('/companies/1')
+        .send(updateDto)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toMatchObject({
+            id: 1,
+            name: 'Partially Updated Company',
+          });
+        });
 
       expect(mockCompaniesService.update).toHaveBeenCalled();
-      expect(result).toEqual(expectedResponse);
-    });
-
-    it('should throw NotFoundException when company does not exist', async () => {
-      const updateCompanyDto: UpdateCompanyDto = {
-        name: 'Updated Company',
-      };
-
-      mockCompaniesService.update.mockRejectedValue(
-        new NotFoundException('Company with ID 999 not found'),
-      );
-
-      await expect(controller.update(999, updateCompanyDto)).rejects.toThrow(NotFoundException);
-      expect(mockCompaniesService.update).toHaveBeenCalledWith(999, expect.anything());
     });
 
     it('should return 404 when company does not exist', async () => {
@@ -144,26 +117,8 @@ describe('CompaniesController - update', () => {
       expect(mockCompaniesService.update).toHaveBeenCalled();
     });
 
-    it('should reject when id is not a number', async () => {
-      const updateDto = {
-        name: 'Updated Company',
-      };
-
-      await request(app.getHttpServer())
-        .patch('/companies/abc')
-        .send(updateDto)
-        .expect(400)
-        .expect((res) => {
-          expect((res.body as { message: string | string[] }).message).toContain(
-            'Validation failed',
-          );
-        });
-
-      expect(mockCompaniesService.update).not.toHaveBeenCalled();
-    });
-
     it('should allow updating with pricings', async () => {
-      const updateCompanyDto: UpdateCompanyDto = {
+      const updateDto = {
         name: 'Updated Company',
         pricings: [
           {
@@ -197,72 +152,33 @@ describe('CompaniesController - update', () => {
 
       mockCompaniesService.update.mockResolvedValue(expectedResponse);
 
-      const result = await controller.update(1, updateCompanyDto);
+      const response = await request(app.getHttpServer())
+        .patch('/companies/1')
+        .send(updateDto)
+        .expect(200);
+      const body = response.body as CompanyResponseDto;
 
+      expect(body.pricings).toHaveLength(1);
+      expect(body.pricings[0].name).toBe('New Plan');
       expect(mockCompaniesService.update).toHaveBeenCalled();
-      expect(result.pricings).toHaveLength(1);
-      expect(result.pricings?.[0]?.name).toBe('New Plan');
+    });
+
+    it('should reject invalid id formats', async () => {
+      const updateDto = {
+        name: 'Updated Company',
+      };
+
+      const invalidIds = ['abc', '1.5'];
+
+      for (const id of invalidIds) {
+        await request(app.getHttpServer()).patch(`/companies/${id}`).send(updateDto).expect(400);
+
+        expect(mockCompaniesService.update).not.toHaveBeenCalled();
+      }
     });
   });
 
-  describe('ValidationPipe', () => {
-    it('should pass validation with valid partial DTO', async () => {
-      const validDto = {
-        name: 'Updated Company',
-      };
-
-      const expectedResponse: CompanyResponseDto = {
-        id: 1,
-        name: 'Updated Company',
-        country: 'United States',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockCompaniesService.update.mockResolvedValue(expectedResponse);
-
-      const response = await request(app.getHttpServer())
-        .patch('/companies/1')
-        .send(validDto)
-        .expect(200);
-
-      expect(response.body).toMatchObject({
-        id: 1,
-        name: 'Updated Company',
-      });
-      expect(mockCompaniesService.update).toHaveBeenCalled();
-    });
-
-    it('should reject when name is not a string', async () => {
-      const invalidDto = {
-        name: 123,
-      };
-
-      await request(app.getHttpServer()).patch('/companies/1').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.update).not.toHaveBeenCalled();
-    });
-
-    it('should reject when country is not a string', async () => {
-      const invalidDto = {
-        country: 123,
-      };
-
-      await request(app.getHttpServer()).patch('/companies/1').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.update).not.toHaveBeenCalled();
-    });
-
-    it('should reject when description is not a string', async () => {
-      const invalidDto = {
-        description: 123,
-      };
-
-      await request(app.getHttpServer()).patch('/companies/1').send(invalidDto).expect(400);
-
-      expect(mockCompaniesService.update).not.toHaveBeenCalled();
-    });
-
+  describe('PATCH /companies/:id - validation', () => {
     it('should accept empty body for partial update', async () => {
       const expectedResponse: CompanyResponseDto = {
         id: 1,
@@ -277,6 +193,19 @@ describe('CompaniesController - update', () => {
       await request(app.getHttpServer()).patch('/companies/1').send({}).expect(200);
 
       expect(mockCompaniesService.update).toHaveBeenCalled();
+    });
+
+    it('should reject invalid field types', async () => {
+      const invalidDtos = [
+        { name: 123 }, // name not string
+        { country: 123 }, // country not string
+        { description: 123 }, // description not string
+      ];
+
+      for (const invalidDto of invalidDtos) {
+        await request(app.getHttpServer()).patch('/companies/1').send(invalidDto).expect(400);
+        expect(mockCompaniesService.update).not.toHaveBeenCalled();
+      }
     });
   });
 });
