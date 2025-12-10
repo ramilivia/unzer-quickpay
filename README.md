@@ -117,7 +117,7 @@ Expected response:
 }
 ```
 
-## API Documentation
+### 4. Open API Documentation
 
 Once the service is running, interactive API documentation is available via Swagger UI:
 
@@ -159,9 +159,6 @@ npm test
 # Test coverage
 npm run test:cov
 
-# E2E tests
-npm run test:e2e
-```
 
 ### Database Migrations
 
@@ -264,7 +261,6 @@ Navigate to: `http://localhost:5050`
    - **Password**: `postgres` (from your `.env` file)
    - ✅ Check "Save password" (optional)
 
-⚠️ **These database credentials match your `.env` file values for local development only.**
 
 4. Click **"Save"**
 
