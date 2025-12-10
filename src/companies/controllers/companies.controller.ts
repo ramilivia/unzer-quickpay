@@ -21,18 +21,13 @@ import {
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiBadRequestResponse,
-  ApiExtraModels,
 } from '@nestjs/swagger';
 import { CompaniesService } from '../services/companies.service';
 import { CreateCompanyDto } from '../dto/create-company.dto';
 import { UpdateCompanyDto } from '../dto/update-company.dto';
 import { CompanyResponseDto } from '../dto/company-response.dto';
-import { ValidationErrorResponseDto } from '../dto/validation-error-response.dto';
-import { BadRequestErrorResponseDto } from '../dto/bad-request-error-response.dto';
-import { ServiceErrorResponseDto } from '../dto/service-error-response.dto';
 
 @ApiTags('Companies Module')
-@ApiExtraModels(ValidationErrorResponseDto, BadRequestErrorResponseDto, ServiceErrorResponseDto)
 @Controller('companies')
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
@@ -55,13 +50,6 @@ export class CompaniesController {
       '   Example: { "statusCode": 400, "message": ["name must be a string", "name should not be empty"], "error": "Bad Request" }\n' +
       '2) Business logic errors (Service): Returns single error message.\n' +
       '   Example: { "statusCode": 400, "message": "A base plan is required when creating relative pricings", "error": "Bad Request" }',
-    type: ValidationErrorResponseDto,
-    schema: {
-      oneOf: [
-        { $ref: '#/components/schemas/ValidationErrorResponseDto' },
-        { $ref: '#/components/schemas/ServiceErrorResponseDto' },
-      ],
-    },
   })
   create(
     @Body(new ValidationPipe()) createCompanyDto: CreateCompanyDto,
@@ -91,8 +79,7 @@ export class CompaniesController {
   @ApiNotFoundResponse({ description: 'Company not found' })
   @ApiBadRequestResponse({
     description:
-      'Invalid ID format. ID must be a valid integer. Returned by ParseIntPipe when ID cannot be parsed as a number.',
-    type: BadRequestErrorResponseDto,
+      'Invalid ID format. ID must be a valid integer. Returned by ParseIntPipe when ID cannot be parsed as a number. Example: { "statusCode": 400, "message": "Validation failed (numeric string is expected)", "error": "Bad Request" }',
   })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<CompanyResponseDto> {
     const company = await this.companiesService.findOne(id);
@@ -122,14 +109,6 @@ export class CompaniesController {
       '   Example: { "statusCode": 400, "message": "Validation failed (numeric string is expected)", "error": "Bad Request" }\n' +
       '3) Business logic errors (Service): Returns single error message.\n' +
       '   Example: { "statusCode": 400, "message": "A base plan is required when updating with relative pricings", "error": "Bad Request" }',
-    type: ValidationErrorResponseDto,
-    schema: {
-      oneOf: [
-        { $ref: '#/components/schemas/ValidationErrorResponseDto' },
-        { $ref: '#/components/schemas/BadRequestErrorResponseDto' },
-        { $ref: '#/components/schemas/ServiceErrorResponseDto' },
-      ],
-    },
   })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -148,8 +127,7 @@ export class CompaniesController {
   @ApiNotFoundResponse({ description: 'Company not found' })
   @ApiBadRequestResponse({
     description:
-      'Invalid ID format. ID must be a valid integer. Returned by ParseIntPipe when ID cannot be parsed as a number.',
-    type: BadRequestErrorResponseDto,
+      'Invalid ID format. ID must be a valid integer. Returned by ParseIntPipe when ID cannot be parsed as a number. Example: { "statusCode": 400, "message": "Validation failed (numeric string is expected)", "error": "Bad Request" }',
   })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.companiesService.remove(id);
