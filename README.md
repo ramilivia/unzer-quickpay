@@ -154,7 +154,7 @@ src/
 
 The project uses Git hooks to maintain code quality:
 
-- **Pre-commit hook**: Automatically runs `prettier` (formatting) and `eslint` (linting) on staged TypeScript files before each commit
+- **Pre-commit hook**: Automatically runs `prettier` (formatting) and `eslint` (linting) only on staged TypeScript files before each commit
 - **Pre-push hook**: Automatically runs all unit tests before pushing to the remote repository
 
 This ensures that:
@@ -162,7 +162,7 @@ This ensures that:
 - Code passes linting rules
 - All tests pass before code is pushed
 
-Hooks are managed by [Husky](https://typicode.github.io/husky/) and [lint-staged](https://github.com/okonet/lint-staged).
+Git Hooks are managed by [Husky](https://typicode.github.io/husky/) and [lint-staged](https://github.com/okonet/lint-staged).
 
 ### Running tests
 
