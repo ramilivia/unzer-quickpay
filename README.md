@@ -81,14 +81,7 @@ PostgreSQL is a powerful, open-source relational database known for reliability,
 
 ## Quick Start
 
-### 1. Clone the repository
-
-```bash
-git clone <repository-url>
-cd unzer-quickpay
-```
-
-### 2. Setup environment variables
+### 1. Setup environment variables
 
 Rename `.env.example` to `.env`:
 
@@ -101,7 +94,7 @@ cp .env.example .env
 The `.env` file contains the database configuration for local development. You can modify the values if needed for your local setup.
 
 
-### 3. Start all services
+### 2. Start all services
 
 ```bash
 docker-compose up
@@ -112,11 +105,9 @@ This will start:
 - NestJS API on port `3000`
 - pgAdmin on port `5050`
 
-### 4. Verify the API is running
+### 3. Verify the API is running
 
-```bash
-curl http://localhost:3000/
-```
+Open your browser and navigate to: `http://localhost:3000/`
 
 Expected response:
 ```json
@@ -158,22 +149,6 @@ src/
 ```
 
 ## Development
-
-### Running locally (without Docker)
-
-```bash
-# Install dependencies
-npm install
-
-# Start PostgreSQL locally or use Docker only for DB
-docker-compose up postgres
-
-# Run migrations
-npm run migration:run
-
-# Start development server
-npm run start:dev
-```
 
 ### Running tests
 
